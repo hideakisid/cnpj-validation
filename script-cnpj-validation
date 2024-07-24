@@ -1,0 +1,64 @@
+<script>
+/* SETUP DOS IDS DO FORM
+ * 
+ * Insira os ID's CSS de acordo com os campos do seu formulário.
+ *  */	
+	
+var cnpj='#wpforms-13317-field_33';
+var situacao='#wpforms-13317-field_34';
+var nome='#wpforms-13317-field_35';
+var fantasia='#wpforms-13317-field_5';
+var email='#wpforms-13317-field_7';	
+
+//-------------------------------------------			
+			
+/* CODIGO BRUTO */			
+var $jq = jQuery.noConflict();
+$jq(document).ready(function() {
+
+function limpa_formulario() {
+// Limpa valores do formulário.
+$jq(cnpj).val('');
+$jq(situacao).val('');
+$jq(nome).val('');
+$jq(fantasia).val('');
+$jq(email).val('');
+}
+            
+//Quando o campo CNPJ perde o foco.
+$jq(cnpj).blur(function() {
+//Nova variável "CNPJ" somente com dígitos.
+var cnpj_consultado = $jq(this).val().replace(/\D/g, '');
+
+//Verifica se campo CNPJ possui valor informado.
+if (cnpj_consultado !='') {
+//Expressão regular para validar o CNPJ.
+var validacnpj = /^[0-9]{14}$/;
+//Valida o formato do CNPJ.
+if(validacnpj.test(cnpj_consultado)) {
+//Preenche os campos com "..." enquanto consulta webservice.
+$jq(cnpj).val('...');
+$jq(situacao).val('...');
+$jq(nome).val('...');
+$jq(fantasia).val('...');
+$jq(email).val('...');	
+
+
+//Consulta o webservice receitaws.com.br/
+$jq.getJSON('https://www.receitaws.com.br/v1/cnpj/'+ cnpj_consultado +'/?callback=?', function(dados) {
+if (dados.status === 'ERROR') {
+//Atualiza os campos com os valores da consulta.
+window.alert('CNPJ inválido!');
+limpa_formulario();		
+} //end if.
+$jq(cnpj).val(dados.cnpj);
+$jq(situacao).val(dados.situacao);
+$jq(nome).val(dados.nome);
+$jq(fantasia).val(dados.fantasia);		
+$jq(email).val(dados.email);
+});
+} 
+}
+});
+});
+</script>
